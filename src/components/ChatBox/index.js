@@ -4,6 +4,7 @@ export const ChatBox = () => {
 
 	const [msgs, setMsgs] = useState(['What do you want to know? Please feel free to ask me!']);
 	const [value, setValue] = useState("");
+	const [loading, setLoading] = useState(false);
 
 	const handleInput = React.useCallback(
 		(e) => {
@@ -14,6 +15,7 @@ export const ChatBox = () => {
 
 	const handleClick = async () => {
 		setMsgs([...msgs, value]);
+		setLoading(true);
 		console.log("val", value);
 		const response = await fetch("/api/hello", {
 			method: "POST",
@@ -25,12 +27,12 @@ export const ChatBox = () => {
 		const data = await response.json();
 		setValue("");
 		setMsgs([...msgs, data.result.choices[0].text]);
+		setLoading(false);
 		console.log("msg", msgs)
 	}
 
-	const handleKeyDown =  (e) => {
-		if (e.key === 'Enter')
-		{
+	const handleKeyDown = (e) => {
+		if (e.key === 'Enter') {
 			handleClick();
 		}
 	}
@@ -39,6 +41,11 @@ export const ChatBox = () => {
 		<div className="flex justify-center mt-[100px] h-[82vh]">
 			<div id="frame">
 				<div className="chat-content h-[75vh] bg-[#7e7c7c]">
+					{loading && (
+						<div id="spinner-container" className="absolute top-[35%] left-[40%]">
+							<div id="loading-spinner" />
+						</div>
+					)}
 					<div className="contact-profile">
 						<img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
 						<p>Harvey Specter</p>
@@ -60,7 +67,10 @@ export const ChatBox = () => {
 					</div>
 					<div className="message-input">
 						<div className="wrap flex justify-around">
-							<input type="text" placeholder="Write your message..." value={value || ""} onKeyDown={handleKeyDown} onChange={handleInput} />
+							{
+								loading ? <input type="text" disabled placeholder="Write your message..." value={value || ""} onKeyDown={handleKeyDown} onChange={handleInput} />
+								: <input type="text" placeholder="Write your message..." value={value || ""} onKeyDown={handleKeyDown} onChange={handleInput} />
+							}
 							<i className="fa fa-paperclip attachment" aria-hidden="true"></i>
 							<button className="submit" onClick={handleClick}>Send</button>
 						</div>
