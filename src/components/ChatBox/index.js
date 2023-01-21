@@ -15,6 +15,7 @@ export const ChatBox = () => {
 
 	const handleClick = async () => {
 		setMsgs([...msgs, value]);
+		var temp = [];
 		setLoading(true);
 		console.log("val", value);
 		const response = await fetch("/api/hello", {
@@ -25,8 +26,9 @@ export const ChatBox = () => {
 			body: JSON.stringify({ text: value }),
 		});
 		const data = await response.json();
+		temp = [value, data.result.choices[0].text];
 		setValue("");
-		setMsgs([...msgs, data.result.choices[0].text]);
+		setMsgs([...msgs, ...temp]);
 		setLoading(false);
 		console.log("msg", msgs)
 	}
@@ -71,7 +73,6 @@ export const ChatBox = () => {
 								loading ? <input type="text" disabled placeholder="Write your message..." value={value || ""} onKeyDown={handleKeyDown} onChange={handleInput} />
 								: <input type="text" placeholder="Write your message..." value={value || ""} onKeyDown={handleKeyDown} onChange={handleInput} />
 							}
-							<i className="fa fa-paperclip attachment" aria-hidden="true"></i>
 							<button className="submit" onClick={handleClick}>Send</button>
 						</div>
 					</div>
